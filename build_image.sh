@@ -1,23 +1,23 @@
 #!/bin/bash
 
-# Prompt for the PHP tag
-echo "Enter PHP tag for the debian base PHP image: "
-read tagName
-export TAG_NAME=$tagName
+TAG_NAME=8.3
 
-# Ask if the image should also be tagged as "latest" (default: no)
-read -p "Do you want to also tag this image as 'latest'? (y/N) " tagLatest
-
-echo "Building image..."
-docker build --build-arg PHP_TAG=$TAG_NAME -t ghcr.io/redfieldchristabel/php_grpc:$TAG_NAME .
-
-if [[ "$tagLatest" =~ ^[Yy] ]]; then
-  docker tag ghcr.io/redfieldchristabel/php_grpc:$TAG_NAME ghcr.io/redfieldchristabel/php_grpc:latest
+if ! docker buildx inspect multiplatform &> /dev/null; then
+  echo "Creating multiplatform builder..."
+  docker buildx create --use --name multiplatform --driver docker-container
+else
+  docker buildx use multiplatform
 fi
 
-echo "Pushing image..."
-docker push ghcr.io/redfieldchristabel/php_grpc:$TAG_NAME
 
-if [[ "$tagLatest" =~ ^[Yy] ]]; then
-  docker push ghcr.io/redfieldchristabel/php_grpc:latest
-fi
+PLATFORM=${1:-"linux/amd64,linux/arm64"}
+
+echo "Building and pushing image for PHP $TAG_NAME on platform(s): $PLATFORM..."
+docker buildx build --platform $PLATFORM \
+  --build-arg PHP_TAG=$TAG_NAME \
+  --provenance=false \
+  --sbom=false \
+  -t ghcr.io/samius/php_grpc:$TAG_NAME \
+  --push .
+
+echo "Done! Image available at: ghcr.io/samius/php_grpc:$TAG_NAME"

@@ -8,7 +8,6 @@ This repository hosts a Docker image that includes the pre-built [gRPC PHP exten
 ## Supported PHP Versions
 
 - PHP 8.3
-- PHP 8.4
 
 
 ## How to Use
@@ -17,10 +16,10 @@ In your Dockerfile, use the multi-stage build feature to copy the pre-built gRPC
 
 ```dockerfile
 # Copy all PHP extension files (including grpc.so) from our pre-built image
-COPY --from=ghcr.io/redfieldchristabel/php_grpc:8.3 /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
+COPY --from=ghcr.io/samius/phpgrpc:8.3 /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
 
 # Copy the gRPC PHP configuration file
-COPY --from=ghcr.io/redfieldchristabel/php_grpc:8.3 /usr/local/etc/php/conf.d/docker-php-ext-grpc.ini /usr/local/etc/php/conf.d/docker-php-ext-grpc.ini
+COPY --from=ghcr.io/samius/phpgrpc:8.3 /usr/local/etc/php/conf.d/docker-php-ext-grpc.ini /usr/local/etc/php/conf.d/docker-php-ext-grpc.ini
 
 # Enable the gRPC PHP extension
 RUN docker-php-ext-enable grpc
@@ -34,8 +33,8 @@ RUN pecl install protobuf && docker-php-ext-enable grpc protobuf
 
 ## Example of grpc and protobuf for php client
 ```dockerfile
-COPY --from=ghcr.io/redfieldchristabel/php_grpc:8.3 /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
-COPY --from=ghcr.io/redfieldchristabel/php_grpc:8.3 /usr/local/etc/php/conf.d/docker-php-ext-grpc.ini /usr/local/etc/php/conf.d/docker-php-ext-grpc.ini
+COPY --from=ghcr.io/samius/phpgrpc:8.3 /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
+COPY --from=ghcr.io/samius/phpgrpc:8.3 /usr/local/etc/php/conf.d/docker-php-ext-grpc.ini /usr/local/etc/php/conf.d/docker-php-ext-grpc.ini
 
 RUN pecl install protobuf && docker-php-ext-enable grpc protobuf
 ```
